@@ -1,4 +1,4 @@
-# Cloudflare Zero Trust Ad Blocker
+# Cloudflare Zero Trust Ad Blocker 
 
 Block ads across all devices without needing Pi-hole. Enjoy faster, ad-free browsing! 🎉
 
