@@ -23,4 +23,4 @@ jobs:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           bundle install
-          bundle exec ruby lib/run.rb
+          bundle exec ruby run.rb
