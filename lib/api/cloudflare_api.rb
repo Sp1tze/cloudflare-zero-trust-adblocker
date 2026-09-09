@@ -23,11 +23,11 @@ module API
       reset_rate_limit_if_needed
       retries_429 = 0 # rubocop:disable Naming/VariableNumber
       retries_other = 0
-      Utils::Log.logger.debug("Starting API call: #{method.upcase} #{url}")
+      ::Utils::Log.logger.debug("Starting API call: #{method.upcase} #{url}")
 
       loop do
         if rate_limited?
-          Utils::Log.logger.warn("Rate limit reached, retrying after #{RATE_LIMIT_WINDOW} seconds...")
+          ::Utils::Log.logger.warn("Rate limit reached, retrying after #{RATE_LIMIT_WINDOW} seconds...")
           sleep(RATE_LIMIT_WINDOW)
         end
 
@@ -47,30 +47,30 @@ module API
       case status_code
       when 429
         retries_429 += 1 # rubocop:disable Naming/VariableNumber
-        Utils::Terminate.exit_with_error("Max retries exceeded for 429 errors on #{url}") if retries_429 > MAX_RETRIES
+        ::Utils::Terminate.exit_with_error("Max retries exceeded for 429 errors on #{url}") if retries_429 > MAX_RETRIES
 
         sleep_time = calculate_429_backoff_time(retries_429)
-        Utils::Log.logger.warn("Received 429 Too Many Requests, retrying in #{sleep_time} seconds... (attempt #{retries_429})")
+        ::Utils::Log.logger.warn("Received 429 Too Many Requests, retrying in #{sleep_time} seconds... (attempt #{retries_429})")
         sleep(sleep_time)
 
         { action: :continue, retries_429: retries_429, retries_other: retries_other } # rubocop:disable Naming/VariableNumber
       when 200..299
-        Utils::Log.logger.debug("Received successful response (#{status_code}), parsing result...")
+        ::Utils::Log.logger.debug("Received successful response (#{status_code}), parsing result...")
         @request_count += 1
 
         { action: :return, data: JSON.parse(response.body)['result'], retries_429: retries_429, retries_other: retries_other } # rubocop:disable Naming/VariableNumber
       when *RETRYABLE_STATUS_CODES
         retries_other += 1
-        Utils::Terminate.exit_with_error("Max retries exceeded for HTTP #{status_code} errors on #{url}. Last error: #{response.body}") if retries_other > MAX_RETRIES
+        ::Utils::Terminate.exit_with_error("Max retries exceeded for HTTP #{status_code} errors on #{url}. Last error: #{response.body}") if retries_other > MAX_RETRIES
 
         sleep_time = calculate_other_backoff_time(retries_other)
-        Utils::Log.logger.warn("Received HTTP #{status_code} error, retrying in #{sleep_time} seconds... (attempt #{retries_other}): #{response.body}")
+        ::Utils::Log.logger.warn("Received HTTP #{status_code} error, retrying in #{sleep_time} seconds... (attempt #{retries_other}): #{response.body}")
         sleep(sleep_time)
 
         { action: :continue, retries_429: retries_429, retries_other: retries_other } # rubocop:disable Naming/VariableNumber
       else
         # Non-retryable errors (4xx client errors, etc.)
-        Utils::Terminate.exit_with_error("HTTP Error #{status_code} when calling #{URI(url)}: #{response.body}")
+        ::Utils::Terminate.exit_with_error("HTTP Error #{status_code} when calling #{URI(url)}: #{response.body}")
       end
     end
 
@@ -87,7 +87,7 @@ module API
                 when :delete
                   Net::HTTP::Delete.new(uri)
                 else
-                  Utils::Terminate.exit_with_error("Unsupported HTTP method: #{method}")
+                  ::Utils::Terminate.exit_with_error("Unsupported HTTP method: #{method}")
                 end
 
       request['Authorization'] = "Bearer #{ENV.fetch('CF_API_TOKEN', nil)}"
@@ -120,7 +120,7 @@ module API
 
       @request_count = 0
       @last_reset_time = Time.now
-      Utils::Log.logger.info('Rate limit window reset.')
+      ::Utils::Log.logger.info('Rate limit window reset.')
     end
   end
 end
