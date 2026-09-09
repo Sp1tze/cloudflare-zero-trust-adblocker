@@ -90,8 +90,7 @@ module API
                   Utils::Terminate.exit_with_error("Unsupported HTTP method: #{method}")
                 end
 
-      request['X-Auth-Email'] = CLOUDFLARE_EMAIL
-      request['X-Auth-Key'] = CLOUDFLARE_API_KEY
+      request['Authorization'] = "Bearer #{ENV.fetch('CF_API_TOKEN', nil)}"
       request['Content-Type'] = 'application/json'
       request.body = body.to_json if body
 
