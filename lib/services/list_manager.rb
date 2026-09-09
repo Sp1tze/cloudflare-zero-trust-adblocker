@@ -1,11 +1,17 @@
 require_relative '../api/cloudflare_api'
 require_relative '../utils/logger'
+require_relative '../utils/terminate'
 
 module Services
   class ListManager
     def self.fetch_existing_lists
+      account_id = ENV.fetch('CF_ACCOUNT_ID', nil)
+      if account_id.nil? || account_id.strip.empty? || account_id.length != 32
+        Utils::Terminate.exit_with_error("CRITICAL: CF_ACCOUNT_ID is missing, empty, or has an invalid length! Value: '#{account_id}'")
+      end
+
       Utils::Log.logger.info('Retrieving existing lists...')
-      result = API::CloudflareAPI.api_call(:get, "https://api.cloudflare.com/client/v4/accounts/#{ENV.fetch('CF_ACCOUNT_ID', nil)}/gateway/rules/lists")
+      result = API::CloudflareAPI.api_call(:get, "https://api.cloudflare.com/client/v4/accounts/#{account_id}/gateway/rules/lists")
       if result.nil?
         Utils::Log.logger.warn('API returned nil for lists, using empty array')
         return []
@@ -15,15 +21,25 @@ module Services
     end
 
     def self.create_list(name, description, domains)
+      account_id = ENV.fetch('CF_ACCOUNT_ID', nil)
+      if account_id.nil? || account_id.strip.empty? || account_id.length != 32
+        Utils::Terminate.exit_with_error("CRITICAL: CF_ACCOUNT_ID is missing, empty, or has an invalid length! Value: '#{account_id}'")
+      end
+
       Utils::Log.logger.info("Creating list '#{name}'...")
       items = domains.map { |domain| { 'value' => domain } }
       body = { name: name, description: description, type: 'DOMAIN', items: items }
-      API::CloudflareAPI.api_call(:post, "https://api.cloudflare.com/client/v4/accounts/#{ENV.fetch('CF_ACCOUNT_ID', nil)}/gateway/rules/lists", body)
+      API::CloudflareAPI.api_call(:post, "https://api.cloudflare.com/client/v4/accounts/#{account_id}/gateway/rules/lists", body)
     end
 
     def self.delete_list(list_id)
+      account_id = ENV.fetch('CF_ACCOUNT_ID', nil)
+      if account_id.nil? || account_id.strip.empty? || account_id.length != 32
+        Utils::Terminate.exit_with_error("CRITICAL: CF_ACCOUNT_ID is missing, empty, or has an invalid length! Value: '#{account_id}'")
+      end
+
       Utils::Log.logger.info("Deleting list with ID #{list_id}...")
-      API::CloudflareAPI.api_call(:delete, "https://api.cloudflare.com/client/v4/accounts/#{ENV.fetch('CF_ACCOUNT_ID', nil)}/gateway/rules/lists/#{list_id}")
+      API::CloudflareAPI.api_call(:delete, "https://api.cloudflare.com/client/v4/accounts/#{account_id}/gateway/rules/lists/#{list_id}")
     end
   end
 end
