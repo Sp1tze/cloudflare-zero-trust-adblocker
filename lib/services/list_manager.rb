@@ -14,7 +14,7 @@ module Services
     def self.fetch_existing_lists
       ::Utils::Log.logger.info('Retrieving existing lists...')
       acc_id = account_id
-      result = API::CloudflareAPI.api_call(:get, "https://api.cloudflare.com/client/v4/accounts/#{acc_id}/gateway/rules/lists")
+      result = API::CloudflareAPI.api_call(:get, "https://api.cloudflare.com/client/v4/accounts/#{acc_id}/gateway/lists")
       return [] if result.nil?
 
       ::Utils::Log.logger.debug("Retrieved #{result.size} existing lists")
@@ -26,13 +26,13 @@ module Services
       items = domains.map { |domain| { 'value' => domain } }
       body = { name: name, description: description, type: 'DOMAIN', items: items }
       acc_id = account_id
-      API::CloudflareAPI.api_call(:post, "https://api.cloudflare.com/client/v4/accounts/#{acc_id}/gateway/rules/lists", body)
+      API::CloudflareAPI.api_call(:post, "https://api.cloudflare.com/client/v4/accounts/#{acc_id}/gateway/lists", body)
     end
 
     def self.delete_list(list_id)
       ::Utils::Log.logger.info("Deleting list with ID #{list_id}...")
       acc_id = account_id
-      API::CloudflareAPI.api_call(:delete, "https://api.cloudflare.com/client/v4/accounts/#{acc_id}/gateway/rules/lists/#{list_id}")
+      API::CloudflareAPI.api_call(:delete, "https://api.cloudflare.com/client/v4/accounts/#{acc_id}/gateway/lists/#{list_id}")
     end
   end
 end
