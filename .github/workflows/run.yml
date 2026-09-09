@@ -23,4 +23,4 @@ jobs:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           bundle install
-          bundle exec rake
+          bundle exec ruby lib/cloudflare_zero_trust_adblocker.rb
