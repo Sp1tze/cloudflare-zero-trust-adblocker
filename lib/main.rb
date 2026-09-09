@@ -1,4 +1,6 @@
 require_relative '../config/application'
+require_relative 'utils/logger'
+require_relative 'utils/terminate'
 require_relative 'utils/pid_manager'
 require_relative 'processors/ad_list_processor'
 require_relative 'processors/exclusions_loader'
