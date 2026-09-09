@@ -5,9 +5,10 @@ require_relative '../utils/terminate'
 module Services
   class ListManager
     def self.account_id
-      id = ENV.fetch('CF_ACCOUNT_ID', nil)
-      ::Utils::Terminate.exit_with_error("CRITICAL: CF_ACCOUNT_ID is missing, empty, or has an invalid length! Value: '#{id}'") if id.nil? || id.strip.empty? || id.length != 32
-      id
+      id = ENV['CF_ACCOUNT_ID']
+      ::Utils::Log.logger.info("DEBUG: CF_ACCOUNT_ID value is '#{id}' (length: #{id&.length})")
+      ::Utils::Terminate.exit_with_error("CRITICAL: CF_ACCOUNT_ID is missing or invalid!") if id.nil? || id.strip.empty? || id.length != 32
+      id.strip
     end
 
     def self.fetch_existing_lists
