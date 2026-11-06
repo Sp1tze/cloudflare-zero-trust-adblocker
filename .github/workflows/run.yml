@@ -3,7 +3,7 @@ name: Run Adblocker Sync
 on:
   workflow_dispatch:
   schedule:
-    - cron: '5 3 * * *'
+    - cron: '17 22 * * *'
 
 jobs:
   sync:
